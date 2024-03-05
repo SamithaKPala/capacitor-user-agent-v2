@@ -20,9 +20,24 @@ public class UserAgentPlugin: CAPPlugin {
 
     @objc func set(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            let ua = call.getString("userAgent") ?? nil
-            self.bridge?.webView?.customUserAgent = ua
-            call.resolve()
+            let newUA = call.getString("userAgent") ?? nil
+             
+             // Check if the provided user-agent is not nil
+             guard let userAgent = newUA else {
+                 call.reject("User agent cannot be nil")
+                 return
+             }
+             
+             // Set the new user-agent for the web view
+                if self.bridge?.webView?.customUserAgent != userAgent {
+                      // Set the new user-agent for the web view
+                      self.bridge?.webView?.customUserAgent = userAgent
+                      
+                      // Reload the web view to apply the new user-agent
+                      self.bridge?.webView?.reload()
+                  }
+             
+             call.resolve()   
         }
     }
 
